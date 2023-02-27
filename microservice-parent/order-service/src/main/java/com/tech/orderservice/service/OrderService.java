@@ -21,7 +21,7 @@ import java.util.UUID;
 public class OrderService {
     private final OrderRepository orderRepository;
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
     public void placeOder(OrderRequest orderRequest) {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
@@ -34,8 +34,8 @@ public class OrderService {
         final List<String> skus = orderLineItems.stream().map(OrderLineItems::getSkuCode).toList();
 
         // Check if inventory avl.
-        final InventoryResponse[] inventoryResponses = webClient.get()
-            .uri("http://localhost:8082/api/inventory",
+        final InventoryResponse[] inventoryResponses = webClientBuilder.build().get()
+            .uri("http://inventory-service/api/inventory",
                 uriBuilder -> uriBuilder.queryParam("skuCode", skus).build())
             .retrieve()
             .bodyToMono(InventoryResponse[].class)
